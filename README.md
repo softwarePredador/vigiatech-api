@@ -97,6 +97,33 @@ npm start
 
 A API estará disponível em `http://localhost:3000`
 
+## 🌐 Deployment
+
+### Status Atual: ✅ FUNCIONANDO
+
+A VigiatTech API está **ONLINE** e funcionando no EasyPanel:
+
+**🔗 URL da API**: https://teta-vigiatech-api.8ktevp.easypanel.host/
+
+**📋 Endpoints Testados**:
+- ✅ Health Check: `/health`
+- ✅ Info da API: `/`
+- ✅ Autenticação: `/api/auth/*`
+- ✅ Máquinas: `/api/machines/*`
+- ✅ Alertas: `/api/alerts/*`
+- ✅ Ingestão IoT: `/api/ingest/*`
+
+**🧪 Para testar a API**:
+```bash
+# Health check
+curl https://teta-vigiatech-api.8ktevp.easypanel.host/health
+
+# Ou execute o script de teste completo
+./test-api.sh
+```
+
+**📚 Documentação completa de deployment**: Veja `DEPLOY.md`
+
 ## 📡 Endpoints da API
 
 ### Autenticação

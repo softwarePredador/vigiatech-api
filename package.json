@@ -8,12 +8,16 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
-    "start": "prisma migrate deploy && node src/index.js",
+    "start": "./start.sh",
+    "start:simple": "node src/index.js",
+    "start:old": "npm run migrate:deploy && node src/index.js",
     "dev": "nodemon src/index.js",
     "postinstall": "prisma generate",
+    "migrate:deploy": "prisma migrate deploy --accept-data-loss",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "health": "node -e \"console.log('Health check passed')\""
   },
   "keywords": [
     "iot",

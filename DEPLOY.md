@@ -293,9 +293,58 @@ Para habilitar deploy automático quando você fizer push no GitHub:
 - [ ] Adicionar autenticação de API Key para dispositivos IoT
 - [ ] Configurar monitoramento com Sentry ou similar
 
+## ✅ Status do Deployment (Atualizado: 07/11/2025)
+
+### Deployment Atual Funcionando
+
+A API está **FUNCIONANDO** no EasyPanel com as seguintes configurações:
+
+**URL da API**: https://teta-vigiatech-api.8ktevp.easypanel.host/
+
+**Variáveis de Ambiente Configuradas**:
+```env
+DATABASE_URL="postgresql://vigiatech:72f73685a575c11480a5@banco_vigiatech-db:5432/vigiatech-db?schema=public"
+PORT=3000
+NODE_ENV=development  # ⚠️ Mudar para 'production' em deploy final
+JWT_SECRET=vigiatech-jwt-secret-key-change-in-production  # ✅ Configurado
+OPENAI_API_KEY=[CONFIGURADO] # ✅ API Key válida
+FIREBASE_PROJECT_ID=vigiatech-1cc9b  # ✅ Configurado
+ML_SERVICE_URL=http://analista-ml:8000  # ✅ Configurado
+```
+
+**Endpoints Testados e Funcionando**:
+- ✅ GET `/health` - Health check OK
+- ✅ GET `/` - Informações da API OK
+- ✅ Todas as rotas `/api/auth/*` disponíveis
+- ✅ Todas as rotas `/api/machines/*` disponíveis
+- ✅ Todas as rotas `/api/alerts/*` disponíveis
+- ✅ Todas as rotas `/api/ingest/*` disponíveis
+
+**Status do Banco de Dados**:
+- ✅ PostgreSQL conectado
+- ✅ Migrations executadas
+- ✅ Prisma Client funcionando
+
+### Próximas Melhorias Recomendadas
+
+1. **Segurança (URGENTE)**:
+   - [ ] Alterar `NODE_ENV` para `production`
+   - [ ] Gerar novo `JWT_SECRET` mais seguro para produção
+   - [ ] Implementar rate limiting
+
+2. **Monitoramento**:
+   - [ ] Configurar logs estruturados
+   - [ ] Adicionar métricas de performance
+   - [ ] Configurar alertas de erro
+
+3. **Domínio Customizado**:
+   - [ ] Configurar domínio próprio (ex: `api.vigiatech.com`)
+   - [ ] SSL/HTTPS automático via Let's Encrypt
+
 ## 📞 Suporte
 
 Se tiver problemas:
 1. Verifique os logs no EasyPanel
 2. Consulte a documentação do Prisma: https://www.prisma.io/docs
 3. Abra uma issue no GitHub do projeto
+4. A API atual está funcionando em: https://teta-vigiatech-api.8ktevp.easypanel.host/
