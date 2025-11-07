@@ -16,13 +16,20 @@ class MLService {
     }
 
     try {
+      // Create an AbortController for timeout
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch(`${this.mlServiceUrl}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        signal: controller.signal
       });
+
+      clearTimeout(timeout);
 
       if (!response.ok) {
         throw new Error(`ML Service responded with status ${response.status}`);
@@ -31,7 +38,7 @@ class MLService {
       const analysis = await response.json();
       return analysis;
     } catch (error) {
-      console.error('Erro ao chamar serviço ML:', error);
+      console.error('Error calling ML service:', error);
       // Fallback to mock analysis if ML service fails
       return this.mockAnalysis(data);
     }

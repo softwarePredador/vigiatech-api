@@ -28,7 +28,7 @@ class LLMService {
       
       return this.mockDiagnostic(machineData, mlAnalysis);
     } catch (error) {
-      console.error('Erro ao chamar LLM:', error);
+      console.error('Error calling LLM service:', error);
       // Fallback to mock if LLM fails
       return this.mockDiagnostic(machineData, mlAnalysis);
     }
@@ -60,86 +60,110 @@ Responda APENAS com o JSON, sem texto adicional.`;
   }
 
   async callOpenAI(prompt) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.openaiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: 'Você é um especialista em manutenção preditiva industrial. Responda sempre em português brasileiro.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      })
-    });
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    // Try to parse JSON response
     try {
-      return JSON.parse(content);
-    } catch {
-      // If not JSON, format the response
-      return {
-        status: 'Alerta de Vibração',
-        information: content
-      };
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.openaiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content: 'Você é um especialista em manutenção preditiva industrial. Responda sempre em português brasileiro.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`OpenAI API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      // Try to parse JSON response
+      try {
+        return JSON.parse(content);
+      } catch {
+        // If not JSON, format the response
+        return {
+          status: 'Alerta de Vibração',
+          information: content
+        };
+      }
+    } catch (error) {
+      clearTimeout(timeout);
+      throw error;
     }
   }
 
   async callGemini(prompt) {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${this.geminiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 500
-          }
-        })
-      }
-    );
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.candidates[0].content.parts[0].text;
-    
-    // Try to parse JSON response
     try {
-      return JSON.parse(content);
-    } catch {
-      // If not JSON, format the response
-      return {
-        status: 'Alerta de Vibração',
-        information: content
-      };
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${this.geminiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 500
+            }
+          }),
+          signal: controller.signal
+        }
+      );
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`Gemini API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.candidates[0].content.parts[0].text;
+      
+      // Try to parse JSON response
+      try {
+        return JSON.parse(content);
+      } catch {
+        // If not JSON, format the response
+        return {
+          status: 'Alerta de Vibração',
+          information: content
+        };
+      }
+    } catch (error) {
+      clearTimeout(timeout);
+      throw error;
     }
   }
 

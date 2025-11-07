@@ -47,7 +47,7 @@ class IngestionController {
 
       // Asynchronously analyze the data with ML (don't wait for response)
       this.analyzeVibrationAsync(machineId, savedData, machine).catch(error => {
-        console.error('Erro na análise assíncrona:', error);
+        console.error('Error in async analysis:', error);
       });
 
       // Return success immediately
@@ -108,7 +108,7 @@ class IngestionController {
         // await notificationService.sendAlert(machine.userId, alert);
       }
     } catch (error) {
-      console.error('Erro na análise assíncrona:', error);
+      console.error('Error in async analysis:', error);
       throw error;
     }
   }
