@@ -125,20 +125,23 @@ Endpoints disponíveis:
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('📝 SIGTERM recebido, fechando servidor...');
+const gracefulShutdown = (signal) => {
+  console.log(`📝 ${signal} recebido, fechando servidor graciosamente...`);
+  
+  // Set a timeout to force shutdown if it takes too long
+  const shutdownTimeout = setTimeout(() => {
+    console.error('⚠️ Shutdown timeout, forçando encerramento...');
+    process.exit(1);
+  }, 10000); // 10 seconds timeout
+  
   server.close(() => {
+    clearTimeout(shutdownTimeout);
     console.log('✅ Servidor fechado com sucesso');
     process.exit(0);
   });
-});
+};
 
-process.on('SIGINT', () => {
-  console.log('📝 SIGINT recebido, fechando servidor...');
-  server.close(() => {
-    console.log('✅ Servidor fechado com sucesso');
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 module.exports = app;
