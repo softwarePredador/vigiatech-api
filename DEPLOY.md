@@ -34,7 +34,52 @@ Este guia detalha o processo de deploy da VigiatTech API no EasyPanel.
    postgresql://postgres:senha@vigiatech-db:5432/vigiatech-db
    ```
 
-## 🚀 Passo 2: Deploy da API
+## � CORREÇÃO URGENTE: Configuração EasyPanel
+
+### Problema Atual: 502 Bad Gateway
+
+**Data**: 07/11/2025
+**Status**: API local funciona, EasyPanel com 502
+
+### Configuração Correta no EasyPanel
+
+#### Opção 1: Docker (RECOMENDADO)
+1. **Construção**: Selecione **"Dockerfile"** 
+2. **Construtor**: Será detectado automaticamente
+3. **Porta**: `3000`
+
+#### Opção 2: Buildpacks (Se preferir)
+1. **Construção**: Selecione **"Buildpacks"**
+2. **Construtor**: `heroku/buildpack:24`
+3. **Start Command**: (deixe vazio, vai usar npm start)
+4. **Porta**: `3000`
+
+### Variáveis de Ambiente Obrigatórias
+```env
+DATABASE_URL=postgresql://vigiatech:72f73685a575c11480a5@banco_vigiatech-db:5432/vigiatech-db?schema=public
+PORT=3000
+NODE_ENV=production
+JWT_SECRET=vigiatech-jwt-secret-key-change-in-production
+```
+
+### Recursos Mínimos
+- **Memory**: 256MB (mínimo) ou 512MB (recomendado)
+- **CPU**: 0.5 cores
+
+### Health Check
+- **Path**: `/health` 
+- **Port**: `3000`
+- **Initial Delay**: 60 segundos
+
+### Passos Urgentes:
+1. ✅ Código está funcionando (testado localmente)
+2. 🔧 Configurar Docker ou ajustar Buildpacks no painel
+3. 🚀 Fazer redeploy
+4. ✅ Testar endpoints
+
+---
+
+## �🚀 Passo 2: Deploy da API (Versão Atualizada)
 
 ### 2.1 Criar o App no EasyPanel
 
