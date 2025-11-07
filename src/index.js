@@ -2,11 +2,23 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// Import routes
-const authRoutes = require('./routes/authRoutes');
-const machineRoutes = require('./routes/machineRoutes');
-const alertRoutes = require('./routes/alertRoutes');
-const ingestionRoutes = require('./routes/ingestionRoutes');
+console.log('🚀 Iniciando VigiatTech API...');
+console.log('📦 NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('🔗 DATABASE_URL:', process.env.DATABASE_URL ? 'Configurado' : 'Não configurado');
+
+// Import routes with error handling
+let authRoutes, machineRoutes, alertRoutes, ingestionRoutes;
+
+try {
+  authRoutes = require('./routes/authRoutes');
+  machineRoutes = require('./routes/machineRoutes');
+  alertRoutes = require('./routes/alertRoutes');
+  ingestionRoutes = require('./routes/ingestionRoutes');
+  console.log('✅ Routes carregadas com sucesso');
+} catch (error) {
+  console.error('❌ Erro ao carregar routes:', error.message);
+  process.exit(1);
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -67,7 +79,17 @@ app.use((error, req, res, next) => {
 });
 
 // Start server
-app.listen(port, () => {
+// Error handling
+app.use((err, req, res, next) => {
+  console.error('❌ Erro na aplicação:', err.message);
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// Start server
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
@@ -97,6 +119,26 @@ Endpoints disponíveis:
   - PUT  /api/alerts/:id/resolve
   - POST /api/ingest/vibration
   `);
+}).on('error', (err) => {
+  console.error('❌ Erro ao iniciar servidor:', err.message);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('📝 SIGTERM recebido, fechando servidor...');
+  server.close(() => {
+    console.log('✅ Servidor fechado com sucesso');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('📝 SIGINT recebido, fechando servidor...');
+  server.close(() => {
+    console.log('✅ Servidor fechado com sucesso');
+    process.exit(0);
+  });
 });
 
 module.exports = app;
