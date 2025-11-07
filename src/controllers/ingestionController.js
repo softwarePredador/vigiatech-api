@@ -39,7 +39,7 @@ class IngestionController {
         }
       });
 
-      console.log(`Dados de vibração recebidos da Machine ${machineId}:`, {
+      console.log(`Dados de vibração recebidos da Machine ${parseInt(machineId)}:`, {
         rms,
         peakFreq,
         timestamp: savedData.timestamp
@@ -102,7 +102,7 @@ class IngestionController {
           data: { status: 'alert' }
         });
 
-        console.log(`Alerta criado para Machine ${machineId}:`, alert.id);
+        console.log(`Alerta criado para Machine ${parseInt(machineId)}:`, alert.id);
 
         // TODO: Send push notification to user
         // await notificationService.sendAlert(machine.userId, alert);

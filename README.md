@@ -345,6 +345,38 @@ O EasyPanel irá automaticamente configurar SSL/HTTPS.
 - CORS habilitado (configure domains em produção)
 - Validação de entrada em todos os endpoints
 - Ownership verification (usuários só acessam suas próprias máquinas)
+- Timeout handling em chamadas externas (ML: 10s, LLM: 30s)
+
+### Recomendações para Produção
+
+Para ambientes de produção, considere implementar:
+
+1. **Rate Limiting**: Use `express-rate-limit` para prevenir abuse
+   ```bash
+   npm install express-rate-limit
+   ```
+
+2. **API Key para IoT**: Implemente autenticação por API key para dispositivos
+   ```javascript
+   // Exemplo de middleware de API key
+   const apiKeyAuth = (req, res, next) => {
+     const apiKey = req.headers['x-api-key'];
+     if (!apiKey || !isValidApiKey(apiKey)) {
+       return res.status(401).json({ error: 'API key inválida' });
+     }
+     next();
+   };
+   ```
+
+3. **Helmet.js**: Adicione headers de segurança
+   ```bash
+   npm install helmet
+   ```
+
+4. **Input Sanitization**: Valide e sanitize todas as entradas
+   ```bash
+   npm install express-validator
+   ```
 
 ## 🧪 Desenvolvimento
 
