@@ -8,12 +8,14 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
-    "start": "./start.sh",
+    "start": "node src/index.js",
+    "build": "npx prisma generate",
+    "start:with-migrate": "npx prisma generate && npx prisma db push --force-reset && node src/index.js",
+    "start:robust": "./start.sh",
     "start:simple": "node src/index.js",
-    "start:old": "npm run migrate:deploy && node src/index.js",
     "dev": "nodemon src/index.js",
     "postinstall": "prisma generate",
-    "migrate:deploy": "prisma migrate deploy --accept-data-loss",
+    "migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
