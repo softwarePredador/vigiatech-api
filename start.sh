@@ -31,7 +31,7 @@ npx prisma generate || {
 
 # Testar conexão com banco
 echo "🗄️ Testando conexão com banco..."
-timeout 30s npx prisma db push --accept-data-loss --force-reset || {
+timeout 30s npx prisma db push --force-reset || {
     echo "❌ Erro ao conectar com banco de dados"
     exit 1
 }
@@ -40,7 +40,7 @@ echo "✅ Banco de dados conectado"
 
 # Executar migrations
 echo "🔄 Executando migrations..."
-timeout 60s npx prisma migrate deploy --accept-data-loss || {
+timeout 60s npx prisma migrate deploy || {
     echo "⚠️ Aviso: Erro nas migrations, mas continuando..."
 }
 
