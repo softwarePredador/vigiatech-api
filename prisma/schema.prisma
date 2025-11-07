@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String    // Hashed password
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  machines  Machine[]
+
+  @@map("users")
+}
+
+model Machine {
+  id            Int             @id @default(autoincrement())
+  name          String
+  type          String?         // e.g., "Compressor de Pistão"
+  description   String?
+  status        String          @default("normal") // normal, warning, alert
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  lastMaintenance DateTime?
+  vibrationData VibrationData[]
+  alerts        Alert[]
+
+  @@map("machines")
+}
+
+model VibrationData {
+  id          Int      @id @default(autoincrement())
+  machineId   Int
+  machine     Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  timestamp   DateTime @default(now())
+  rms         Float    // Root Mean Square vibration
+  peakFreq    Float    // Peak frequency in Hz
+  amplitude   Float?   // Amplitude value
+  xAxis       Float?   // X-axis acceleration
+  yAxis       Float?   // Y-axis acceleration
+  zAxis       Float?   // Z-axis acceleration
+  rawData     Json?    // Store raw sensor data as JSON
+  
+  @@index([machineId, timestamp])
+  @@map("vibration_data")
+}
+
+model Alert {
+  id          Int      @id @default(autoincrement())
+  machineId   Int
+  machine     Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  timestamp   DateTime @default(now())
+  severity    String   // low, medium, high, critical
+  status      String   // Title/status message from LLM
+  information String   @db.Text // Detailed explanation from LLM
+  anomalyScore Float?  // Score from ML model (0-1)
+  resolvedAt  DateTime?
+  isResolved  Boolean  @default(false)
+  
+  // ML Model outputs
+  mlFeatures  Json?    // Store ML analysis features
+  
+  @@index([machineId, timestamp])
+  @@map("alerts")
+}
